@@ -640,6 +640,7 @@ button{font:inherit;color:inherit}
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
 'use strict';
@@ -650,11 +651,20 @@ button{font:inherit;color:inherit}
 const WHATSAPP_NUMBER = '918838724331';   // country code + number, no "+" or spaces
 const PHONE = '+91 88387 24331';
 const BRAND = 'FLOODLIT';
+const SUPABASE_URL = 'https://zlgrillfsglbinqdxizm.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_C9u46GYw-981MaTfEDA_KQ_yJQYxKgz';
+
+const supabaseConfigured = SUPABASE_URL.startsWith('https://') &&
+  !SUPABASE_URL.includes('YOUR_SUPABASE') &&
+  SUPABASE_PUBLISHABLE_KEY && !SUPABASE_PUBLISHABLE_KEY.includes('YOUR_SUPABASE');
+const supabaseClient = supabaseConfigured && window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
 
 /* ============================================================
    DATA
    ============================================================ */
-const TURFS = [
+let TURFS = [
   { id:'arena',     name:'Chennai Arena Turf',    area:'Velachery',          sports:['Football','Cricket'],    rating:4.8, price:699, open:6, close:25, img:'1630420598913-44208d36f9af' },
   { id:'omr',       name:'OMR Night Arena',       area:'Thoraipakkam, OMR',  sports:['Football'],              rating:4.9, price:799, open:6, close:25, img:'1431324155629-1a6deb1dec8d' },
   { id:'striker',   name:"Striker's Den",         area:'Sholinganallur',     sports:['Football','Cricket'],    rating:4.7, price:699, open:5, close:25, img:'1630420598771-dd52ab08c8cb' },
@@ -666,6 +676,14 @@ const TURFS = [
   { id:'tnagar',    name:'T Nagar Rooftop Turf',  area:'T Nagar',            sports:['Football','Cricket'],    rating:4.8, price:849, open:6, close:25, img:'1621058567697-7673eef9ce28' },
   { id:'ecr',       name:'ECR Sands Arena',       area:'Injambakkam, ECR',   sports:['Volleyball','Football'], rating:4.9, price:899, open:6, close:24, img:'1601512986351-9b0e01780eef' },
 ];
+
+// Live Supabase data. The original catalog remains as a visual fallback if the database is unavailable.
+const FALLBACK_TURFS = TURFS.map(t => ({ ...t }));
+let DB_READY = false;
+let DB_HOURS = [];
+let DB_BLOCKED = [];
+let DB_PRICES = [];
+let DB_PERIODS = [];
 const SPORTS = [['Football', 'i-ball'], ['Cricket', 'i-bat'], ['Badminton', 'i-shuttle'], ['Volleyball', 'i-vball']];
 const TABS = [['Morning', 5, 12], ['Afternoon', 12, 16], ['Evening', 16, 20], ['Night', 20, 30]];
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -700,18 +718,150 @@ function seeded(str) {
   for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
   return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
+function timeHour(value, fallback) {
+  if (!value) return fallback;
+  const m = String(value).match(/^(\\d{1,2}):(\\d{2})/);
+  if (!m) return fallback;
+  const h = Number(m[1]), mins = Number(m[2]);
+  return h + (mins > 0 ? 1 : 0);
+}
+function dayOfWeekDb(day) {
+  const jsDay = parse(day).getDay();
+  return jsDay; // Supabase operating_hours uses Sunday=0, Monday=1 ... Saturday=6.
+}
 function slotsFor(t, day) {
-  const rnd = seeded(t.id + day), now = new Date(), wk = isWeekend(day), out = [];
-  for (let h = t.open; h < t.close; h++) {
-    let p = (h >= 18 && h <= 22) ? .48 : (h >= 6 && h <= 8) ? .3 : .14;
-    if (wk) p += .12;
+  const now = new Date(), out = [];
+  const hoursRow = DB_READY
+    ? DB_HOURS.find(x => String(x.turf_id) === String(t.id) && Number(x.day_of_week) === dayOfWeekDb(day))
+    : null;
+  if (DB_READY && (!hoursRow || hoursRow.is_open === false)) return out;
+  const open = hoursRow ? timeHour(hoursRow.opening_time, t.open) : t.open;
+  let close = hoursRow ? timeHour(hoursRow.closing_time, t.close) : t.close;
+  // A closing time of midnight represents the end of the current operating day.
+  if (hoursRow && close <= open) close += 24;
+  for (let h = open; h < close; h++) {
     const past = day === TODAY && h <= now.getHours();
-    out.push({ h, past, booked: past || rnd() < p });
+    const blocked = DB_READY && DB_BLOCKED.some(x => {
+      if (String(x.turf_id) !== String(t.id) || x.slot_date !== day) return false;
+      const start = timeHour(x.start_time, -1), end = timeHour(x.end_time, -1);
+      return start >= 0 && end >= 0 && h >= start && h < (end <= start ? end + 24 : end);
+    });
+    // In live mode, only real operating hours and admin-blocked slots are unavailable.
+    // In fallback mode, retain the original demo availability behaviour.
+    const rnd = seeded(t.id + day + h)();
+    let p = (h >= 18 && h <= 22) ? .48 : (h >= 6 && h <= 8) ? .3 : .14;
+    if (isWeekend(day)) p += .12;
+    out.push({ h, past, booked: past || blocked || (!DB_READY && rnd < p) });
   }
   return out;
 }
-const rate = (t, day, h) => isWeekend(day) ? t.price + 300 : h >= 20 ? t.price + 200 : t.price;
+function isNightHour(h, t) {
+  const period = DB_PERIODS.find(x => String(x.turf_id) === String(t.id));
+  if (!period) return h >= 18 || h < 6;
+  const start = timeHour(period.nighttime_start, 18);
+  const end = timeHour(period.nighttime_end, 6);
+  return start < end ? h >= start && h < end : h >= start || h < end;
+}
+const rate = (t, day, h) => {
+  if (DB_READY) {
+    const dayType = isWeekend(day) ? 'weekend' : 'weekday';
+    const periodType = isNightHour(h, t) ? 'nighttime' : 'daytime';
+    const row = DB_PRICES.find(x => String(x.turf_id) === String(t.id) && x.day_type === dayType && x.period_type === periodType);
+    if (row && Number.isFinite(Number(row.price_per_hour))) return Number(row.price_per_hour);
+  }
+  return isWeekend(day) ? t.price + 300 : h >= 20 ? t.price + 200 : t.price;
+}
+
+function catalogMatch(row, usedIds) {
+  const norm = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const candidates = [row.slug, row.name, row.location, row.area].map(norm).filter(Boolean);
+  return FALLBACK_TURFS.find(t => !usedIds.has(t.id) &&
+    [t.id, t.name, t.area].map(norm).some(v => candidates.includes(v) || candidates.some(c => c.includes(v) || v.includes(c))));
+}
+
 const disc = n => n === 3 ? .1 : n === 2 ? .05 : 0;
+
+/* ============================================================
+   SUPABASE: load admin-managed turf, hours, blocked slots and prices
+   ============================================================ */
+async function loadLiveData() {
+  if (!supabaseClient || !SUPABASE_URL.startsWith('https://') ||
+      SUPABASE_PUBLISHABLE_KEY.includes('YOUR_SUPABASE')) return;
+
+  try {
+    const [turfsRes, hoursRes, blockedRes, pricesRes, periodsRes] = await Promise.all([
+      supabaseClient.from('turfs').select('*').eq('is_active', true),
+      supabaseClient.from('operating_hours').select('*'),
+      supabaseClient.from('blocked_slots').select('*'),
+      supabaseClient.from('turf_pricing').select('*'),
+      supabaseClient.from('turf_pricing_periods').select('*')
+    ]);
+
+    if (turfsRes.error) throw turfsRes.error;
+    if (!Array.isArray(turfsRes.data) || turfsRes.data.length === 0) {
+      console.warn('Supabase returned no active turfs; keeping the demo catalog.');
+      return;
+    }
+
+    DB_HOURS = hoursRes.error ? [] : (hoursRes.data || []);
+    DB_BLOCKED = blockedRes.error ? [] : (blockedRes.data || []);
+    DB_PRICES = pricesRes.error ? [] : (pricesRes.data || []);
+    DB_PERIODS = periodsRes.error ? [] : (periodsRes.data || []);
+
+    const usedFallback = new Set();
+    TURFS = turfsRes.data.map(row => {
+      const fallback = catalogMatch(row, usedFallback);
+      if (fallback) usedFallback.add(fallback.id);
+      const rawSports = row.sports;
+      let sports = Array.isArray(rawSports) ? rawSports : [];
+      if (typeof rawSports === 'string') {
+        try { const parsed = JSON.parse(rawSports); sports = Array.isArray(parsed) ? parsed : rawSports.split(',').map(s => s.trim()); }
+        catch (_) { sports = rawSports.split(',').map(s => s.trim()); }
+      }
+      if (!sports.length) sports = fallback ? fallback.sports : ['Football'];
+      sports = sports.filter(s => SPORTS.some(([name]) => name.toLowerCase() === String(s).toLowerCase()))
+        .map(s => SPORTS.find(([name]) => name.toLowerCase() === String(s).toLowerCase())[0]);
+      if (!sports.length) sports = ['Football'];
+      const location = row.location || row.area || (fallback && fallback.area) || 'Chennai';
+      return {
+        id: row.id,
+        name: row.name || (fallback && fallback.name) || 'Turf',
+        area: location,
+        sports,
+        rating: Number(row.rating || (fallback && fallback.rating) || 4.7),
+        price: Number(row.hourly_price ?? row.price ?? (fallback && fallback.price) ?? 699),
+        open: fallback ? fallback.open : 6,
+        close: fallback ? fallback.close : 24,
+        img: fallback ? fallback.img : FALLBACK_TURFS[0].img
+      };
+    });
+
+    DB_READY = true;
+    // Refresh the existing UI without changing its layout or WhatsApp booking flow.
+    if (!turf(B.turf) || !turf(B.turf).sports.includes(B.sport)) {
+      B.turf = TURFS[0].id;
+      B.sport = TURFS[0].sports[0];
+    }
+    B.time = null;
+    render({ turfs: true, scrollTurf: false });
+    const grid = $('#turf-grid');
+    grid.innerHTML = TURFS.map(t => `
+      <button type="button" class="turf" data-id="${esc(t.id)}" aria-label="Book ${esc(t.name)}, ${esc(t.area)}, from ${inr(t.price)} an hour">
+        <img src="${U(t.img, 480, 640)}" srcset="${U(t.img, 320, 427)} 320w, ${U(t.img, 480, 640)} 480w" sizes="(max-width:640px) 46vw, (max-width:980px) 31vw, 240px" alt="" loading="lazy" decoding="async">
+        <span class="rate">${icon('i-star', 'fill')}${t.rating}</span>
+        <span class="sp">${t.sports.map(s => `<span title="${esc(s)}">${icon(sportIcon(s))}</span>`).join('')}</span>
+        <span class="tb"><b class="nm">${esc(t.name)}</b><span class="area">${esc(t.area)}</span>
+        <span class="price"><span>From <b>${inr(t.price)}</b>/hr</span><span class="go">${icon('i-arrow-ur')}</span></span></span>
+      </button>`).join('');
+    let liveCount = 0;
+    TURFS.forEach(t => slotsFor(t, TODAY).forEach(s => { if (s.h >= 18 && !s.booked) liveCount++; }));
+    const countTxt = liveCount ? `${liveCount} slot${liveCount === 1 ? '' : 's'}` : 'Slots';
+    $('#live-count').textContent = countTxt;
+    $('#mbar-count').textContent = countTxt;
+  } catch (error) {
+    console.error('Could not load live turf data from Supabase. Using fallback catalog.', error);
+  }
+}
 
 /* ============================================================
    ROLLING TOTAL (scoreboard digits)
@@ -1003,6 +1153,7 @@ idle(() => {
 });
 
 render({ turfs: true, scrollTurf: false });
+loadLiveData();
 addEventListener('resize', () => { pill(elSport); pill(elHours); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { pill(elSport); pill(elHours); });
 })();
