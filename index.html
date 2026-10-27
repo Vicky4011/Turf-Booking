@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Floodlit Chennai</title>
-<meta name="description" content="Book a floodlit football, cricket, badminton or volleyball turf in Chennai. Live slots at 10 venues, confirm on WhatsApp.">
+<meta name="description" content="Book a floodlit football, cricket, badminton or volleyball turf in Chennai. Live slots, confirm on WhatsApp.">
 <meta name="theme-color" content="#070908">
 <!--
   ============================================================
@@ -142,11 +142,11 @@ button{font:inherit;color:inherit}
 .chip-live{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 12px;border-radius:999px;background:var(--lime-soft);color:var(--lime);font-size:13px;font-weight:600}
 .chip-live i{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
 .row{display:grid;grid-template-columns:58px minmax(0,1fr);gap:14px;align-items:start;padding:8px 24px;animation:rise .7s var(--expo) backwards}
-.row:nth-child(2){animation-delay:.55s}.row:nth-child(3){animation-delay:.62s}.row:nth-child(4){animation-delay:.69s}.row:nth-child(5){animation-delay:.76s}.row:nth-child(6){animation-delay:.83s}
+.row:nth-child(2){animation-delay:.55s}.row:nth-child(3){animation-delay:.62s}.row:nth-child(4){animation-delay:.69s}.row:nth-child(5){animation-delay:.76s}
 .row > .lbl{padding-top:9px;font-size:14px;font-weight:600;color:var(--mist)}
 .row > .ctl{min-width:0}
 
-/* sport toggle */
+/* segmented toggle (hours) */
 .seg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:4px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--line)}
 .seg button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;height:40px;border:0;background:transparent;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--mist);transition:color .3s}
 .seg button .icon{width:17px;height:17px}
@@ -186,8 +186,9 @@ button{font:inherit;color:inherit}
 .day.wk[aria-pressed="true"] small{color:var(--on-lime)}
 
 /* time */
-.tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:1px solid var(--line)}
-.tabs button{position:relative;padding:8px 10px 10px;border:0;background:transparent;cursor:pointer;font-size:14px;font-weight:600;color:var(--mist);transition:color .25s}
+.tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{position:relative;flex:0 0 auto;padding:8px 10px 10px;border:0;background:transparent;cursor:pointer;font-size:14px;font-weight:600;color:var(--mist);white-space:nowrap;transition:color .25s}
 .tabs button small{font-weight:500;color:var(--dim);margin-left:4px}
 .tabs button[aria-selected="true"]{color:var(--chalk)}
 .tabs button::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;background:var(--lime);box-shadow:0 0 10px var(--lime);transform:scaleX(0);transition:transform .4s var(--expo)}
@@ -263,7 +264,12 @@ button{font:inherit;color:inherit}
 
 /* ---------- prices ---------- */
 .prices{border-top:1px solid var(--line)}
-.rates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line-2);border-radius:24px;overflow:hidden;background:var(--pitch)}
+.pp{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px;margin:0 0 20px}
+.pp::-webkit-scrollbar{display:none}
+.pp button{flex:0 0 auto;height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--line-2);background:transparent;cursor:pointer;font-size:14px;font-weight:600;color:var(--mist);white-space:nowrap;transition:background-color .3s,border-color .3s,color .3s}
+.pp button:hover{border-color:rgba(200,255,46,.55);color:var(--chalk)}
+.pp button[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
+.rates{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));border:1px solid var(--line-2);border-radius:24px;overflow:hidden;background:var(--pitch)}
 .rate-t{position:relative;padding:28px 28px 30px;border-left:1px solid var(--line)}
 .rate-t:first-child{border-left:0}
 .rate-t h3{margin:0;font-size:17px;font-weight:600}
@@ -325,6 +331,7 @@ button{font:inherit;color:inherit}
 .tk-x .icon{width:18px;height:18px}
 .tk-body{padding:20px 22px 6px}
 .tk-body dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;margin:0}
+.tk-body dl > div:last-child:nth-child(odd){grid-column:1 / -1}
 .tk-body dt{font-size:12.5px;color:#56605a}
 .tk-body dd{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.05}
 .tk-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:14px;border-top:1px solid rgba(10,14,5,.12)}
@@ -363,12 +370,15 @@ button{font:inherit;color:inherit}
   .book{max-width:600px}
   .contact-grid{grid-template-columns:1fr}
   .turfs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rates[data-n="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rates[data-n="4"] .rate-t:nth-child(odd){border-left:0}
+  .rates[data-n="4"] .rate-t:nth-child(n+3){border-top:1px solid var(--line)}
 }
 @media (max-width:760px){
   .nav-links{display:none}
   .nav .btn{margin-left:auto}
-  .rates{grid-template-columns:1fr}
-  .rate-t{border-left:0;border-top:1px solid var(--line)}
+  .rates,.rates[data-n="4"]{grid-template-columns:1fr}
+  .rate-t,.rates[data-n="4"] .rate-t:nth-child(odd){border-left:0;border-top:1px solid var(--line)}
   .rate-t:first-child{border-top:0}
   .mbar{display:flex}
 }
@@ -476,8 +486,7 @@ button{font:inherit;color:inherit}
       <p class="hero-sub">Floodlit turfs for football, cricket, badminton and volleyball across Chennai. Pick a slot, confirm on WhatsApp, play.</p>
       <ul class="trust">
         <li><svg class="icon fill" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9z"/></svg><b>4.8</b> from 2,400+ players</li>
-        <li><svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><b>10</b> venues</li>
-        <li><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>Open <b>5 AM</b> to <b>1 AM</b></li>
+
       </ul>
     </div>
 
@@ -487,10 +496,7 @@ button{font:inherit;color:inherit}
         <span class="chip-live"><i></i>Live availability</span>
       </div>
 
-      <div class="row">
-        <span class="lbl" id="l-sport">Sport</span>
-        <div class="ctl"><div class="seg" id="b-sport" role="group" aria-labelledby="l-sport"><span class="pill"></span></div></div>
-      </div>
+      
       <div class="row">
         <span class="lbl" id="l-turf">Turf</span>
         <div class="ctl"><div class="strip" id="b-turf" role="group" aria-labelledby="l-turf"></div></div>
@@ -547,13 +553,10 @@ button{font:inherit;color:inherit}
   <div class="wrap">
     <div class="sec-head">
       <h2 id="prices-title">Simple hourly prices</h2>
-      <p>Prices at Chennai Arena Turf, Velachery. Every venue shows its own price when you book.</p>
+      <p id="p-sub">Pick a venue to see its hourly prices.</p>
     </div>
-    <div class="rates">
-      <div class="rate-t"><h3>Weekdays</h3><p>Monday to Friday, 6 AM to 8 PM</p><div class="amt"><b>₹699</b><span>an hour</span></div></div>
-      <div class="rate-t top"><span class="tag">Most booked</span><h3>Weekday nights</h3><p>Monday to Friday, 8 PM to 1 AM</p><div class="amt"><b>₹899</b><span>an hour</span></div></div>
-      <div class="rate-t"><h3>Weekends</h3><p>Saturday, Sunday and holidays</p><div class="amt"><b>₹999</b><span>an hour</span></div></div>
-    </div>
+    <div class="pp" id="p-pick" role="group" aria-label="Choose a venue"></div>
+    <div class="rates" id="p-rates"></div>
     <ul class="deals">
       <li><svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Book 2 hours, save 5%</li>
       <li><svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Book 3 hours, save 10%</li>
@@ -624,7 +627,7 @@ button{font:inherit;color:inherit}
     <div class="stamp" aria-hidden="true"><span>Ref<b id="tk-ref">FL-00000</b></span></div>
     <div class="tk-body">
       <dl>
-        <div><dt>Sport</dt><dd id="tk-sport">Football</dd></div>
+
         <div><dt>Day</dt><dd id="tk-day">Today</dd></div>
         <div><dt>Time</dt><dd id="tk-time">8 PM to 9 PM</dd></div>
         <div><dt>Hours</dt><dd id="tk-hours">1</dd></div>
@@ -685,7 +688,9 @@ let DB_BLOCKED = [];
 let DB_PRICES = [];
 let DB_PERIODS = [];
 const SPORTS = [['Football', 'i-ball'], ['Cricket', 'i-bat'], ['Badminton', 'i-shuttle'], ['Volleyball', 'i-vball']];
-const TABS = [['Morning', 5, 12], ['Afternoon', 12, 16], ['Evening', 16, 20], ['Night', 20, 30]];
+// Hours 24-29 mean 12 AM to 5 AM after midnight; they belong to the Night tab.
+// The "Late night" tab only appears for a venue that opens at midnight (hours 0-4 of the same day).
+const TABS = [['Late night', 0, 5], ['Morning', 5, 12], ['Afternoon', 12, 16], ['Evening', 16, 20], ['Night', 20, 30]];
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -700,6 +705,7 @@ const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
 const hr = h => { const x = h % 24, d = x % 12 === 0 ? 12 : x % 12; return `${d} ${x < 12 ? 'AM' : 'PM'}`; };
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const nextDay = s => { const d = parse(s); d.setDate(d.getDate() + 1); return iso(d); };
 const TODAY = iso(new Date());
 const dayName = s => { const d = parse(s), i = Math.round((d - parse(TODAY)) / 864e5); return i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`; };
 const isWeekend = s => [0, 6].includes(parse(s).getDay());
@@ -711,6 +717,7 @@ const SYM = {};
 $$('symbol').forEach(s => { SYM[s.id] = [s.getAttribute('viewBox'), s.innerHTML]; });
 const icon = (id, cls = '') => `<svg class="icon ${cls}" viewBox="${SYM[id][0]}" aria-hidden="true">${SYM[id][1]}</svg>`;
 const idle = f => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 400));
+const sportIcon = s => SPORTS.find(x => x[0] === s)[1];
 
 /* availability: stable per turf + day, prime time fills up first */
 function seeded(str) {
@@ -718,9 +725,10 @@ function seeded(str) {
   for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
   return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
+// "18:00:00" -> 18, "00:30:00" -> 1 (rounded up). FIXED: the old pattern had a doubled backslash and never matched.
 function timeHour(value, fallback) {
   if (!value) return fallback;
-  const m = String(value).match(/^(\\d{1,2}):(\\d{2})/);
+  const m = String(value).match(/^(\d{1,2}):(\d{2})/);
   if (!m) return fallback;
   const h = Number(m[1]), mins = Number(m[2]);
   return h + (mins > 0 ? 1 : 0);
@@ -737,14 +745,20 @@ function slotsFor(t, day) {
   if (DB_READY && (!hoursRow || hoursRow.is_open === false)) return out;
   const open = hoursRow ? timeHour(hoursRow.opening_time, t.open) : t.open;
   let close = hoursRow ? timeHour(hoursRow.closing_time, t.close) : t.close;
-  // A closing time of midnight represents the end of the current operating day.
+  // A closing time at or before the opening time runs past midnight (e.g. open 6 AM, close 5 AM = hours 6 to 29).
   if (hoursRow && close <= open) close += 24;
+  const tomorrow = nextDay(day);
   for (let h = open; h < close; h++) {
     const past = day === TODAY && h <= now.getHours();
     const blocked = DB_READY && DB_BLOCKED.some(x => {
-      if (String(x.turf_id) !== String(t.id) || x.slot_date !== day) return false;
+      if (String(x.turf_id) !== String(t.id)) return false;
       const start = timeHour(x.start_time, -1), end = timeHour(x.end_time, -1);
-      return start >= 0 && end >= 0 && h >= start && h < (end <= start ? end + 24 : end);
+      if (start < 0 || end < 0) return false;
+      const stop = end <= start ? end + 24 : end;
+      // Same-day block, or a block dated the next calendar day that covers the after-midnight hours.
+      if (x.slot_date === day && h >= start && h < stop) return true;
+      if (h >= 24 && x.slot_date === tomorrow && (h - 24) >= start && (h - 24) < stop) return true;
+      return false;
     });
     // In live mode, only real operating hours and admin-blocked slots are unavailable.
     // In fallback mode, retain the original demo availability behaviour.
@@ -762,15 +776,29 @@ function isNightHour(h, t) {
   const end = timeHour(period.nighttime_end, 6);
   return start < end ? h >= start && h < end : h >= start || h < end;
 }
+const priceNum = row => {
+  if (!row || row.price_per_hour == null) return null;
+  const n = Number(row.price_per_hour);
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
 const rate = (t, day, h) => {
   if (DB_READY) {
     const dayType = isWeekend(day) ? 'weekend' : 'weekday';
     const periodType = isNightHour(h, t) ? 'nighttime' : 'daytime';
     const row = DB_PRICES.find(x => String(x.turf_id) === String(t.id) && x.day_type === dayType && x.period_type === periodType);
-    if (row && Number.isFinite(Number(row.price_per_hour))) return Number(row.price_per_hour);
+    const n = priceNum(row);
+    if (n != null) return n;
   }
   return isWeekend(day) ? t.price + 300 : h >= 20 ? t.price + 200 : t.price;
-}
+};
+// Lowest hourly price the admin has set for this turf. Used on every "From ₹X" label.
+const fromPrice = t => {
+  if (DB_READY) {
+    const v = DB_PRICES.filter(x => String(x.turf_id) === String(t.id)).map(priceNum).filter(n => n != null);
+    if (v.length) return Math.min(...v);
+  }
+  return t.price;
+};
 
 function catalogMatch(row, usedIds) {
   const norm = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -780,6 +808,70 @@ function catalogMatch(row, usedIds) {
 }
 
 const disc = n => n === 3 ? .1 : n === 2 ? .05 : 0;
+
+/* ============================================================
+   TURF GRID + PRICE SECTION (both read admin prices)
+   ============================================================ */
+function renderGrid() {
+  $('#turf-grid').innerHTML = TURFS.map(t => `
+    <button type="button" class="turf" data-id="${esc(t.id)}" aria-label="Book ${esc(t.name)}, ${esc(t.area)}, from ${inr(fromPrice(t))} an hour">
+      <img src="${U(t.img, 480, 640)}" srcset="${U(t.img, 320, 427)} 320w, ${U(t.img, 480, 640)} 480w" sizes="(max-width:640px) 46vw, (max-width:980px) 31vw, 240px" alt="" loading="lazy" decoding="async">
+      <span class="rate">${icon('i-star', 'fill')}${t.rating}</span>
+      <span class="sp">${t.sports.map(s => `<span title="${esc(s)}">${icon(sportIcon(s))}</span>`).join('')}</span>
+      <span class="tb">
+        <b class="nm">${esc(t.name)}</b>
+        <span class="area">${esc(t.area)}</span>
+        <span class="price"><span>From <b>${inr(fromPrice(t))}</b>/hr</span><span class="go">${icon('i-arrow-ur')}</span></span>
+      </span>
+    </button>`).join('');
+}
+
+const P = { turf: null };
+function priceCards(t) {
+  const cards = [];
+  if (DB_READY) {
+    const period = DB_PERIODS.find(x => String(x.turf_id) === String(t.id));
+    const ns = period ? timeHour(period.nighttime_start, 18) : 18;
+    const ne = period ? timeHour(period.nighttime_end, 6) : 6;
+    const get = (d, p) => priceNum(DB_PRICES.find(x => String(x.turf_id) === String(t.id) && x.day_type === d && x.period_type === p));
+    [['weekday', 'Weekdays', 'Weekday nights', 'Monday to Friday'], ['weekend', 'Weekends', 'Weekend nights', 'Saturday and Sunday']].forEach(([d, dayT, nightT, days]) => {
+      const dp = get(d, 'daytime'), np = get(d, 'nighttime'), both = dp != null && np != null;
+      if (dp != null) cards.push({ title: dayT, sub: both ? `${days}, ${hr(ne)} to ${hr(ns)}` : days, price: dp });
+      if (np != null) cards.push({ title: both ? nightT : dayT, sub: both ? `${days}, ${hr(ns)} to ${hr(ne)}` : days, price: np, top: both && d === 'weekday' });
+    });
+  }
+  if (!cards.length) {
+    cards.push({ title: 'Weekdays', sub: 'Monday to Friday, 6 AM to 8 PM', price: t.price });
+    cards.push({ title: 'Weekday nights', sub: 'Monday to Friday, 8 PM to 1 AM', price: t.price + 200, top: true });
+    cards.push({ title: 'Weekends', sub: 'Saturday and Sunday', price: t.price + 300 });
+  }
+  return cards;
+}
+function renderPrices() {
+  const t = turf(P.turf) || turf(B.turf) || TURFS[0];
+  P.turf = t.id;
+  $('#p-pick').innerHTML = TURFS.map(x => `<button type="button" data-id="${esc(x.id)}" aria-pressed="${x.id === t.id}">${esc(x.name)}</button>`).join('');
+  $('#p-sub').textContent = `Prices at ${t.name}, ${t.area.split(',')[0]}. Pick another venue to see its prices.`;
+  const cards = priceCards(t);
+  const box = $('#p-rates');
+  box.style.setProperty('--n', cards.length);
+  box.dataset.n = cards.length;
+  box.innerHTML = cards.map(c => `
+    <div class="rate-t${c.top ? ' top' : ''}">${c.top ? '<span class="tag">Most booked</span>' : ''}<h3>${esc(c.title)}</h3><p>${esc(c.sub)}</p><div class="amt"><b>${inr(c.price)}</b><span>an hour</span></div></div>`).join('');
+}
+$('#p-pick').addEventListener('click', e => {
+  const b = e.target.closest('button[data-id]'); if (!b) return;
+  P.turf = b.dataset.id;
+  renderPrices();
+});
+
+function updateTonight() {
+  let tonight = 0;
+  TURFS.forEach(t => slotsFor(t, TODAY).forEach(s => { if (s.h >= 18 && !s.booked) tonight++; }));
+  const countTxt = tonight ? `${tonight} slot${tonight === 1 ? '' : 's'}` : 'Slots';
+  $('#live-count').textContent = countTxt;
+  $('#mbar-count').textContent = countTxt;
+}
 
 /* ============================================================
    SUPABASE: load admin-managed turf, hours, blocked slots and prices
@@ -837,29 +929,16 @@ async function loadLiveData() {
     });
 
     DB_READY = true;
-    // Refresh the existing UI without changing its layout or WhatsApp booking flow.
-    if (!turf(B.turf) || !turf(B.turf).sports.includes(B.sport)) {
-      B.turf = TURFS[0].id;
-      B.sport = TURFS[0].sports[0];
-    }
+    if (!turf(B.turf)) B.turf = TURFS[0].id;
     B.time = null;
+    P.turf = B.turf;
     render({ turfs: true, scrollTurf: false });
-    const grid = $('#turf-grid');
-    grid.innerHTML = TURFS.map(t => `
-      <button type="button" class="turf" data-id="${esc(t.id)}" aria-label="Book ${esc(t.name)}, ${esc(t.area)}, from ${inr(t.price)} an hour">
-        <img src="${U(t.img, 480, 640)}" srcset="${U(t.img, 320, 427)} 320w, ${U(t.img, 480, 640)} 480w" sizes="(max-width:640px) 46vw, (max-width:980px) 31vw, 240px" alt="" loading="lazy" decoding="async">
-        <span class="rate">${icon('i-star', 'fill')}${t.rating}</span>
-        <span class="sp">${t.sports.map(s => `<span title="${esc(s)}">${icon(sportIcon(s))}</span>`).join('')}</span>
-        <span class="tb"><b class="nm">${esc(t.name)}</b><span class="area">${esc(t.area)}</span>
-        <span class="price"><span>From <b>${inr(t.price)}</b>/hr</span><span class="go">${icon('i-arrow-ur')}</span></span></span>
-      </button>`).join('');
-    let liveCount = 0;
-    TURFS.forEach(t => slotsFor(t, TODAY).forEach(s => { if (s.h >= 18 && !s.booked) liveCount++; }));
-    const countTxt = liveCount ? `${liveCount} slot${liveCount === 1 ? '' : 's'}` : 'Slots';
-    $('#live-count').textContent = countTxt;
-    $('#mbar-count').textContent = countTxt;
   } catch (error) {
     console.error('Could not load live turf data from Supabase. Using fallback catalog.', error);
+  } finally {
+    renderGrid();
+    renderPrices();
+    updateTonight();
   }
 }
 
@@ -883,10 +962,9 @@ function odo(el, value) {
 /* ============================================================
    BOOKING
    ============================================================ */
-const B = { sport: 'Football', turf: 'arena', day: TODAY, tab: null, time: null, hours: 1 };
-const elSport = $('#b-sport'), elTurf = $('#b-turf'), elDay = $('#b-day'), elTabs = $('#b-tabs'), elSlots = $('#b-slots'), elHours = $('#b-hours');
+const B = { turf: 'arena', day: TODAY, tab: null, time: null, hours: 1 };
+const elTurf = $('#b-turf'), elDay = $('#b-day'), elTabs = $('#b-tabs'), elSlots = $('#b-slots'), elHours = $('#b-hours');
 
-elSport.insertAdjacentHTML('beforeend', SPORTS.map(([s, ic]) => `<button type="button" data-s="${s}" aria-pressed="false">${icon(ic)}<span>${s}</span></button>`).join(''));
 elDay.innerHTML = Array.from({ length: 10 }, (_, i) => {
   const d = new Date(); d.setDate(d.getDate() + i);
   const s = iso(d);
@@ -914,24 +992,19 @@ function pickTab() {
   const s = slots();
   if (B.time != null) return TABS.find(([, a, z]) => B.time >= a && B.time < z)[0];
   const free = TABS.filter(([, a, z]) => s.some(x => x.h >= a && x.h < z && !x.booked));
-  return (free.find(t => t[0] === 'Night') || free.find(t => t[0] === 'Evening') || free[0] || TABS[3])[0];
+  return (free.find(t => t[0] === 'Night') || free.find(t => t[0] === 'Evening') || free[0] || TABS[4])[0];
 }
 
 function renderTurfs() {
-  const list = TURFS.filter(t => t.sports.includes(B.sport));
-  elTurf.innerHTML = list.map(t => `
-    <button type="button" class="tpick" data-id="${t.id}" aria-pressed="${t.id === B.turf}">
+  elTurf.innerHTML = TURFS.map(t => `
+    <button type="button" class="tpick" data-id="${esc(t.id)}" aria-pressed="${t.id === B.turf}">
       <img src="${U(t.img, 280, 150)}" alt="" loading="lazy" decoding="async">
       <span class="tick">${icon('i-check')}</span>
-      <span class="tx"><b>${esc(t.name)}</b><small>${esc(t.area.split(',')[0])}<em>${inr(t.price)}</em></small></span>
+      <span class="tx"><b>${esc(t.name)}</b><small>${esc(t.area.split(',')[0])}<em>${inr(fromPrice(t))}</em></small></span>
     </button>`).join('');
 }
 function render(opts = {}) {
   const t = turf(B.turf);
-  $$('button', elSport).forEach(b => {
-    b.setAttribute('aria-pressed', String(b.dataset.s === B.sport));
-  });
-  pill(elSport);
   if (opts.turfs) renderTurfs();
   $$('.tpick', elTurf).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === B.turf)));
   if (opts.scrollTurf !== false) intoView(elTurf, $(`.tpick[data-id="${B.turf}"]`, elTurf));
@@ -947,7 +1020,13 @@ function render(opts = {}) {
     const free = list.filter(x => !x.booked).length;
     return `<button type="button" role="tab" data-tab="${name}" aria-selected="${name === B.tab}">${name}<small>${free}</small></button>`;
   }).join('');
-  const [, a, z] = TABS.find(x => x[0] === B.tab);
+  // If the remembered tab has no slots on this turf/day, fall back to one that does.
+  let tabDef = TABS.find(x => x[0] === B.tab);
+  if (!s.some(x => x.h >= tabDef[1] && x.h < tabDef[2])) {
+    const alt = TABS.find(([, a, z]) => s.some(x => x.h >= a && x.h < z));
+    if (alt) { B.tab = alt[0]; tabDef = alt; $$('[data-tab]', elTabs).forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === B.tab))); }
+  }
+  const [, a, z] = tabDef;
   const list = s.filter(x => x.h >= a && x.h < z);
   const range = B.time != null ? Array.from({ length: B.hours }, (_, k) => B.time + k) : [];
   elSlots.innerHTML = list.length && list.some(x => !x.booked)
@@ -980,7 +1059,8 @@ function render(opts = {}) {
   } else {
     $('#s-when').textContent = `${dayName(B.day)}, pick a time`;
     $('#s-label').textContent = 'From, per hour';
-    odo($('#s-total'), rate(t, B.day, 6));
+    // lowest admin-set price among this turf's slots on the chosen day
+    odo($('#s-total'), s.length ? Math.min(...s.map(x => rate(t, B.day, x.h))) : fromPrice(t));
     go.disabled = true;
     $('#b-go-txt').textContent = 'Pick a time';
   }
@@ -991,18 +1071,13 @@ function hint(text, warn) {
   p.classList.toggle('warn', !!warn);
 }
 
-elSport.addEventListener('click', e => {
-  const b = e.target.closest('button[data-s]'); if (!b) return;
-  B.sport = b.dataset.s;
-  if (!turf(B.turf).sports.includes(B.sport)) B.turf = TURFS.find(t => t.sports.includes(B.sport)).id;
-  B.time = null; hint();
-  render({ turfs: true });
-});
+
 elTurf.addEventListener('click', e => {
   const b = e.target.closest('.tpick'); if (!b) return;
   B.turf = b.dataset.id; B.time = null; hint();
   render({ scrollTurf: false });
 });
+
 elDay.addEventListener('click', e => {
   const b = e.target.closest('.day'); if (!b) return;
   B.day = b.dataset.d; B.time = null; hint();
@@ -1034,7 +1109,7 @@ const sheet = $('#sheet');
 let lastFocus = null, ref = '';
 function waText() {
   const t = turf(B.turf), name = $('#tk-name').value.trim();
-  return `Hi ${BRAND}, I'd like to book a slot.\n\nRef: ${ref}\nTurf: ${t.name} (${t.area})\nSport: ${B.sport}\nDay: ${dayName(B.day)} (${B.day})\nTime: ${hr(B.time)} to ${hr(B.time + B.hours)}\nTotal: ${inr(B.total)}` + (name ? `\nName: ${name}` : '');
+  return `Hi ${BRAND}, I'd like to book a slot.\n\nRef: ${ref}\nTurf: ${t.name} (${t.area})\nDay: ${dayName(B.day)} (${B.day})\nTime: ${hr(B.time)} to ${hr(B.time + B.hours)}\nTotal: ${inr(B.total)}` + (name ? `\nName: ${name}` : '');
 }
 $('#book').addEventListener('submit', e => {
   e.preventDefault();
@@ -1045,7 +1120,6 @@ $('#book').addEventListener('submit', e => {
   $('#tk-title').textContent = t.name;
   $('#tk-area').textContent = t.area + ', Chennai';
   $('#tk-ref').textContent = ref;
-  $('#tk-sport').textContent = B.sport;
   $('#tk-day').textContent = dayName(B.day);
   $('#tk-time').textContent = `${hr(B.time)} to ${hr(B.time + B.hours)}`;
   $('#tk-hours').textContent = B.hours;
@@ -1083,19 +1157,6 @@ $$('[data-call]').forEach(a => { a.href = 'tel:' + PHONE.replace(/\s/g, ''); });
 /* ============================================================
    TURF GRID: tap a turf to load it into the booking ticket
    ============================================================ */
-const sportIcon = s => SPORTS.find(x => x[0] === s)[1];
-$('#turf-grid').innerHTML = TURFS.map(t => `
-  <button type="button" class="turf" data-id="${t.id}" aria-label="Book ${esc(t.name)}, ${esc(t.area)}, from ${inr(t.price)} an hour">
-    <img src="${U(t.img, 480, 640)}" srcset="${U(t.img, 320, 427)} 320w, ${U(t.img, 480, 640)} 480w" sizes="(max-width:640px) 46vw, (max-width:980px) 31vw, 240px" alt="" loading="lazy" decoding="async">
-    <span class="rate">${icon('i-star', 'fill')}${t.rating}</span>
-    <span class="sp">${t.sports.map(s => `<span title="${s}">${icon(sportIcon(s))}</span>`).join('')}</span>
-    <span class="tb">
-      <b class="nm">${esc(t.name)}</b>
-      <span class="area">${esc(t.area)}</span>
-      <span class="price"><span>From <b>${inr(t.price)}</b>/hr</span><span class="go">${icon('i-arrow-ur')}</span></span>
-    </span>
-  </button>`).join('');
-
 const nav = $('#nav');
 const navH = () => nav.offsetHeight;
 function toBook() {
@@ -1106,7 +1167,6 @@ $('#turf-grid').addEventListener('click', e => {
   const b = e.target.closest('.turf'); if (!b) return;
   const t = turf(b.dataset.id);
   B.turf = t.id; B.time = null; hint();
-  if (!t.sports.includes(B.sport)) B.sport = t.sports[0];
   render({ turfs: true });
   toBook();
   const pick = $(`.tpick[data-id="${t.id}"]`, elTurf);
@@ -1123,11 +1183,7 @@ $$('.nav-links a, .logo').forEach(a => a.addEventListener('click', e => {
 /* ============================================================
    PAGE: live count, nav, mobile bar, floating dust
    ============================================================ */
-let tonight = 0;
-TURFS.forEach(t => slotsFor(t, TODAY).forEach(s => { if (s.h >= 18 && !s.booked) tonight++; }));
-const countTxt = tonight ? `${tonight} slot${tonight === 1 ? '' : 's'}` : 'Slots';
-$('#live-count').textContent = countTxt;
-$('#mbar-count').textContent = countTxt;
+updateTonight();
 
 const onScroll = () => nav.classList.toggle('solid', scrollY > 30);
 addEventListener('scroll', onScroll, { passive: true }); onScroll();
@@ -1153,9 +1209,12 @@ idle(() => {
 });
 
 render({ turfs: true, scrollTurf: false });
+// With Supabase configured, the turf grid and price section wait for the real admin prices
+// (rendered in loadLiveData). Without it, show the demo catalog straight away.
+if (!supabaseClient) { renderGrid(); renderPrices(); }
 loadLiveData();
-addEventListener('resize', () => { pill(elSport); pill(elHours); });
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { pill(elSport); pill(elHours); });
+addEventListener('resize', () => { pill(elHours); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { pill(elHours); });
 })();
 </script>
 </body>
