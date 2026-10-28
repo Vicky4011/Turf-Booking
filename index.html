@@ -312,7 +312,7 @@ button{font:inherit;color:inherit}
 .group a{color:var(--lime);font-weight:600;text-underline-offset:4px}
 
 /* ---------- contact ---------- */
-.contact{position:relative;isolation:isolate;overflow:hidden;border-top:1px solid var(--line)}
+.contact{position:relative;isolation:isolate;overflow:hidden;border-top:1px solid var(--line);padding-bottom:clamp(22px,2.7vw,36px)}
 .contact-bg{position:absolute;inset:0;z-index:-2}
 .contact-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 65%;opacity:.5}
 .contact::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,var(--ink) 15%,rgba(7,9,8,.6) 60%,rgba(7,9,8,.4)),linear-gradient(0deg,var(--ink),rgba(7,9,8,0) 40%)}
@@ -326,7 +326,7 @@ button{font:inherit;color:inherit}
 .info dd a{text-decoration:none}
 .info dd a:hover{color:var(--lime)}
 .info .full{grid-column:1 / -1}
-.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);color:var(--dim);font-size:14px}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding-block:20px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);color:var(--dim);font-size:14px}
 /* Keep the page ending close to the footer instead of leaving a large empty band. */
 #prices{padding-bottom:18px}
 #prices .foot{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
@@ -483,7 +483,6 @@ button{font:inherit;color:inherit}
     <ul class="nav-links">
       <li><a href="#turfs">Turfs</a></li>
       <li><a href="#prices">Prices</a></li>
-      <li><a href="#book">Book a slot</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <a class="btn btn-lime btn-sm" href="#book" data-go-book><span>Book a slot</span></a>
@@ -635,7 +634,7 @@ button{font:inherit;color:inherit}
     <dl class="info">
       <div><dt>Phone</dt><dd data-phone>+91 90000 00000</dd></div>
       <div><dt>Email</dt><dd>hello@floodlitchennai.in</dd></div>
-      <div><dt>Hours</dt><dd>Every day, 5 AM to 1 AM</dd></div>
+      <div><dt>Hours</dt><dd>Every day, 12 AM to 12 AM</dd></div>
       <div><dt>Head office</dt><dd>Chennai, Tamil Nadu</dd></div>
       <div class="full"><dt>Venues</dt><dd>Velachery, Sholinganallur, OMR, Perungudi, Adyar, Tambaram, Anna Nagar, Porur, T Nagar and ECR</dd></div>
     </dl>
@@ -1300,6 +1299,12 @@ $('#gallery-grid').addEventListener('click', e => {
   lightbox.hidden = false;
   document.body.style.overflow = 'hidden';
 });
+
+function toBook() {
+  const card = $('#book');
+  window.scrollTo({ top: Math.max(0, card.getBoundingClientRect().top + scrollY - navH() - 12), behavior: reduce ? 'auto' : 'smooth' });
+  card.classList.remove('pulse'); void card.offsetWidth; card.classList.add('pulse');
+}
 
 $$('[data-go-book]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toBook(); }));
 $$('.nav-links a, .logo').forEach(a => a.addEventListener('click', e => {
